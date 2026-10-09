@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+artifacts/
+__pycache__/
+*.blend1
+*.blend2
+*.log
+*.env
+.env.*
