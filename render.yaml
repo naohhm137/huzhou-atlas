@@ -2,7 +2,7 @@ services:
   - type: web
     name: huzhou-atlas
     runtime: static
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
     staticPublishPath: ./dist
     envVars:
       - key: NODE_VERSION
