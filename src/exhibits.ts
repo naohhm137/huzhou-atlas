@@ -1,12 +1,45 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { fitCameraDistance, loadExhibitAsset, type ExhibitAssetKind } from './modelAsset';
 import { advanceOrbit, advanceZoom, type Orbit } from './orbitGesture';
 import type { MovablePart } from './models/shared';
 import { SceneFailure } from './sceneFailure';
 
-export type ExhibitKind = ExhibitAssetKind;
+// 'tower' stays a controller id for the Feiying chapter, which renders through src/feiying.
+export type ExhibitKind = ExhibitAssetKind | 'tower';
 type Frame = { distance: number; center: THREE.Vector3 };
+
+// Per-exhibit camera: model yaw so the Lux3D "front" (the reference-image view) faces the
+// visitor, plus elevation and distance relative to the fitted frame. Matches render_item.py.
+const VIEW: Record<ExhibitAssetKind, { yaw: number; elevation: number; distance: number }> = {
+  brush: { yaw: -1.4, elevation: 0.38, distance: 0.82 },
+  silk: { yaw: -1.15, elevation: 0.32, distance: 0.78 },
+  tea: { yaw: -1.3, elevation: 0.56, distance: 0.82 },
+  yishang: { yaw: -1.15, elevation: 0.68, distance: 0.8 },
+  dongwu: { yaw: -1.2, elevation: 0.25, distance: 0.82 },
+  'nanxun-city': { yaw: -1.3, elevation: 0.62, distance: 0.8 },
+};
+
+/** Sky gradient matching the Blender world for each look (render_item.py). */
+type Look = 'studio' | 'dusk' | 'day';
+const LOOK: Record<ExhibitAssetKind, Look> = { brush: 'studio', silk: 'studio', tea: 'studio', yishang: 'dusk', dongwu: 'day', 'nanxun-city': 'dusk' };
+function skyEnvironment(renderer: THREE.WebGLRenderer, look: Look) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const sky = new THREE.Scene();
+  // Dongwu's blue curtain wall only reads blue under a daylight sky, as in its reference photo.
+  const horizon = look === 'day' ? 'vec3(0.55, 0.68, 0.85)' : look === 'dusk' ? 'vec3(0.16, 0.10, 0.06)' : 'vec3(0.06, 0.04, 0.026)';
+  const zenith = look === 'day' ? 'vec3(0.10, 0.25, 0.62)' : 'vec3(0.008, 0.024, 0.026)';
+  sky.add(new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false,
+    vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `varying vec3 vDir; void main(){
+      float h = clamp((vDir.y + 0.05) / 0.6, 0.0, 1.0);
+      vec3 c = vDir.y < -0.05 ? vec3(0.012, 0.012, 0.011) : mix(${horizon}, ${zenith}, h);
+      gl_FragColor = vec4(c, 1.0); }`,
+  })));
+  const target = pmrem.fromScene(sky, 0);
+  pmrem.dispose();
+  return target;
+}
 
 export class ExhibitScene {
   private scene = new THREE.Scene();
@@ -15,7 +48,6 @@ export class ExhibitScene {
   private environmentTarget: THREE.WebGLRenderTarget;
   private root = new THREE.Group();
   private parts: MovablePart[] = [];
-  private roofSeams: THREE.Object3D[] = [];
   private frame = 0;
   private progress = 0;
   private expanded = false;
@@ -34,46 +66,48 @@ export class ExhibitScene {
   private assembled: Frame = { distance: 8, center: new THREE.Vector3() };
   private exploded: Frame = { distance: 12, center: new THREE.Vector3() };
 
-  constructor(private host: HTMLElement, private kind: ExhibitKind, private reduced: boolean, private onError?: (error: SceneFailure) => void) {
+  constructor(private host: HTMLElement, private kind: ExhibitAssetKind, private reduced: boolean, private onError?: (error: SceneFailure) => void) {
     try {
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     } catch (error) {
       throw new SceneFailure('graphics', 'WebGL renderer could not create a graphics context', error);
     }
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same look as the approved Blender renders and the Feiying chapter: ACES, dark sky
+    // environment, three suns with soft shadows. (A white studio environment reads as fog.)
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    const isCity = ['yishang', 'dongwu', 'longemont', 'nanxun-city'].includes(kind);
-    this.renderer.toneMappingExposure = isCity ? 1.08 : 1.16;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 720 ? 1.3 : 1.65));
-    this.renderer.shadowMap.enabled = isCity;
+    this.renderer.toneMappingExposure = 1.0;
+    const small = Math.min(window.innerWidth, window.innerHeight) < 720;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, small ? 1.5 : 2));
+    this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.domElement.className = 'exhibit-canvas';
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
     host.appendChild(this.renderer.domElement);
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const room = new RoomEnvironment();
-    this.environmentTarget = pmrem.fromScene(room);
-    room.dispose();
-    pmrem.dispose();
+    const look = LOOK[kind];
+    this.environmentTarget = skyEnvironment(this.renderer, look);
     this.scene.environment = this.environmentTarget.texture;
-    this.scene.environmentIntensity = isCity ? 0.92 : 0.82;
-    this.scene.add(new THREE.HemisphereLight(0xfff1d7, 0x334d4b, 0.86));
-    const key = new THREE.DirectionalLight(0xffe4b7, 2.05);
-    key.position.set(4, 7, 7);
-    if (isCity) {
-      key.castShadow = true;
-      key.shadow.mapSize.set(window.innerWidth < 720 ? 1024 : 2048, window.innerWidth < 720 ? 1024 : 2048);
-      Object.assign(key.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 0.1, far: 45 });
-      key.shadow.normalBias = 0.018;
-      key.shadow.bias = -0.0002;
+    // Blender (x, y, z) → three (x, z, -y); directions from production/feiying/scripts/render_shots.py.
+    const sun = (bx: number, by: number, bz: number, color: number, intensity: number, shadow: boolean) => {
+      const l = new THREE.DirectionalLight(color, intensity);
+      l.position.set(bx, bz, -by).normalize().multiplyScalar(30);
+      if (shadow) {
+        l.castShadow = true;
+        l.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
+        Object.assign(l.shadow.camera, { left: -6, right: 6, top: 7, bottom: -5, near: 1, far: 70 });
+        l.shadow.bias = -0.0004;
+        l.shadow.normalBias = 0.02;
+      }
+      this.scene.add(l);
+    };
+    if (look === 'day') {
+      sun(-30, -60, 50, 0xfff5e6, 3.4, true);  // high white sun, front-left
+      sun(50, 30, 30, 0xb3d1ff, 0.6, false);   // sky-blue fill
+    } else {
+      sun(-55, 40, 18, 0xffad66, 5.2, true);   // warm, low, back-left: rim
+      sun(-30, -60, 30, 0xffcc99, 2.0, true);  // warm front so the surface reads
+      sun(50, -30, 40, 0x8cbfe6, 0.5, false);  // cool fill
     }
-    this.scene.add(key);
-    const fill = new THREE.DirectionalLight(0xa9d0c8, 0.82);
-    fill.position.set(-6, 2, 4);
-    this.scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xfff0d5, 1.32);
-    rim.position.set(-2, 5, -6);
-    this.scene.add(rim);
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(host);
     this.visibilityObserver = new IntersectionObserver(([entry]) => {
@@ -97,26 +131,15 @@ export class ExhibitScene {
       const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
       this.root.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
-        if (object.name.includes('穹顶细密竖向屋面接缝')) this.roofSeams.push(object);
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        for (const material of materials) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+        for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
           if (!(material instanceof THREE.MeshStandardMaterial)) continue;
-          for (const map of [material.map, material.normalMap, material.roughnessMap]) {
-            if (map) { map.anisotropy = anisotropy; map.needsUpdate = true; }
-          }
+          for (const map of [material.map, material.roughnessMap, material.emissiveMap]) if (map) map.anisotropy = anisotropy;
         }
       });
       this.scene.add(this.root);
-      if (isCity) this.root.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-          object.castShadow = !/水面|河床/.test(object.name);
-          object.receiveShadow = true;
-        }
-      });
-      this.root.rotation.y = kind === 'silk' ? -0.32 : kind === 'tower' ? -0.18
-        : kind === 'yishang' ? -0.26 : kind === 'nanxun-city' ? 0
-        : kind === 'dongwu' ? -0.14 : -0.15;
-      if (kind === 'brush') this.root.rotation.z = 0.24;
+      this.root.rotation.y = VIEW[kind].yaw;
       this.baseRotationY = this.root.rotation.y;
       this.fitFrames();
       this.ready = true;
@@ -176,10 +199,8 @@ export class ExhibitScene {
 
   private frameFromBounds(bounds: THREE.Box3): Frame {
     const size = bounds.getSize(new THREE.Vector3());
-    const cityScale = ['yishang', 'dongwu', 'longemont', 'nanxun-city'].includes(this.kind)
-      ? (this.host.clientWidth < 620 ? 0.88 : 0.92) : 1;
     return {
-      distance: fitCameraDistance({ width: size.x, height: size.y, depth: size.z }, this.camera.fov, this.camera.aspect) * cityScale,
+      distance: fitCameraDistance({ width: size.x, height: size.y, depth: size.z }, this.camera.fov, this.camera.aspect) * VIEW[this.kind].distance,
       center: bounds.getCenter(new THREE.Vector3()),
     };
   }
@@ -216,7 +237,10 @@ export class ExhibitScene {
   resetRotation() { this.orbit = { yaw: 0, pitch: 0 }; this.needsRender = true; }
 
   private render = () => {
-    if (!this.visible || this.disposed) return;
+    // Keep the renderer alive while a pinned chapter is being positioned by
+    // the browser. IntersectionObserver can report a stale value during a
+    // hash jump, which otherwise leaves a blank canvas until the next scroll.
+    if (this.disposed) return;
     cancelAnimationFrame(this.frame);
     this.frame = requestAnimationFrame(this.render);
     if (!this.ready) return;
@@ -229,19 +253,11 @@ export class ExhibitScene {
     this.root.rotation.x = this.orbit.pitch;
     const target = this.assembled.center.clone().lerp(this.exploded.center, this.visualAmount);
     const fittedDistance = THREE.MathUtils.lerp(this.assembled.distance, this.exploded.distance, this.visualAmount);
-    const distance = fittedDistance * (this.kind === 'tea' ? 1 - this.visualAmount * 0.16 : 1) * this.zoom;
-    const elevation = this.kind === 'tea' ? distance * 0.58 : this.kind === 'silk' ? distance * 0.12
-      : this.kind === 'yishang' || this.kind === 'longemont' ? distance * 0.49
-      : this.kind === 'nanxun-city' ? distance * 0.22
-      : this.kind === 'dongwu' ? -distance * 0.12 : distance * 0.035;
-    const lateral = this.kind === 'nanxun-city' ? -distance * 0.35
-      : this.kind === 'dongwu' ? distance * 0.12 : 0;
-    this.camera.position.set(target.x + lateral, target.y + elevation, target.z + distance);
+    // Whole models: "expanded" moves the camera in for a close look instead of exploding parts.
+    const distance = fittedDistance * (1 - this.visualAmount * 0.32) * this.zoom;
+    const elevation = distance * VIEW[this.kind].elevation;
+    this.camera.position.set(target.x, target.y + elevation, target.z + distance);
     this.camera.lookAt(target);
-    // Subpixel ribs flicker as dotted lines at atlas scale. Keep the authored
-    // geometry for close inspection, where its diameter covers a full pixel.
-    const seamPixels = 0.016 * this.host.clientHeight / (2 * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.position.distanceTo(target));
-    for (const seam of this.roofSeams) seam.visible = seamPixels >= 0.85;
     this.renderer.render(this.scene, this.camera);
     this.needsRender = false;
   };

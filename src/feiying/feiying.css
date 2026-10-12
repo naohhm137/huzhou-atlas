@@ -1,0 +1,141 @@
+/* Feiying chapter — palette, type and layout from production/feiying/design/design-spec.md */
+.feiying {
+  --fy-bg: #0e1a1a;
+  --fy-text: #efe6d2;
+  --fy-muted: #a7b0a6;
+  --fy-accent: #c8a15a;
+  --fy-edge: clamp(1.25rem, 4vw, 4.5rem);
+  --p: 0; --s: 0; --pines: 1; --mist: 1;
+  position: relative;
+  height: 820svh;
+  background: var(--fy-bg);
+  color: var(--fy-text);
+}
+.feiying__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; isolation: isolate; }
+
+/* Parallax stack (tutorial 5.4): sky slowest, mist, model, pines fastest, copy on top.
+   Mist sits behind the model: screen-blended over it, it read as a white fog on the tower. */
+.feiying__sky, .feiying__mist, .feiying__pines, .feiying__glow, .feiying__fade, .feiying__grain { position: absolute; pointer-events: none; }
+.feiying__sky { z-index: 0; inset: -6% -4%; background-size: cover; background-position: 50% 50%; transform: translate3d(0, calc(var(--p) * -5%), 0) scale(1.04); filter: saturate(.9) brightness(.92); }
+.feiying__glow { z-index: 0; inset: 0; background: radial-gradient(ellipse 55% 42% at 24% 78%, #c8a15a2e, transparent 70%), linear-gradient(180deg, transparent 55%, #0e1a1a 100%); }
+.feiying__stage { position: absolute; inset: 0; z-index: 2; }
+.feiying-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.feiying__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.feiying--ready .feiying__poster { display: none; }
+.feiying--error .feiying-canvas, .feiying--loading .feiying-canvas { visibility: hidden; }
+.feiying__mist { z-index: 1; inset: auto -10% -4% -10%; height: 58%; background-size: cover; background-position: 50% 100%; mix-blend-mode: screen;
+  opacity: calc(var(--mist) * .55); transform: translate3d(calc(var(--p) * -9%), calc(var(--p) * 6%), 0); }
+.feiying__pines { z-index: 3; inset: auto -6% -2% -6%; height: 100%; background-size: cover; background-position: 50% 100%;
+  opacity: var(--pines); transform: translate3d(0, calc((1 - var(--pines)) * 18%), 0) scale(calc(1 + (1 - var(--pines)) * .12)); transform-origin: 50% 100%; }
+.feiying__fade { z-index: 4; inset: 0; background: #070c0c; opacity: var(--feiying-fade, 0); }
+.feiying__grain { display: none; } /* screen-blended grain lifted the blacks into haze */
+.feiying__sticky::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 80% 75% at 50% 45%, transparent 55%, #050a0acc 100%); }
+
+/* Chapter bar sits under the site masthead: mark, numbered nav, free-view entry. */
+.feiying__bar { position: absolute; z-index: 6; top: clamp(6.2rem, 11vh, 7.2rem); left: var(--fy-edge); right: var(--fy-edge); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.feiying__mark { margin: 0; display: grid; font: 500 1.05rem/1.1 var(--font-display); letter-spacing: .32em; }
+.feiying__mark small { font: 400 .55rem/1.6 var(--font-body); letter-spacing: .26em; color: var(--fy-muted); }
+.feiying__nav { display: flex; gap: clamp(.8rem, 2vw, 2rem); }
+.feiying__nav button, .feiying__free, .feiying__actions > * { appearance: none; background: none; border: 0; color: var(--fy-muted); font: 400 .82rem/1 var(--font-display); letter-spacing: .12em; cursor: pointer; padding: .55rem 0; position: relative; transition: color var(--dur-normal) var(--ease-out); }
+.feiying__nav button span { font-size: .7rem; margin-right: .2rem; }
+.feiying__nav button:hover, .feiying__nav button[aria-current] { color: var(--fy-accent); }
+.feiying__nav button[aria-current]::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 1.6rem; height: 1px; background: var(--fy-accent); transform: translateX(-50%); }
+.feiying__free { color: var(--fy-text); }
+.feiying__free:disabled { opacity: .4; cursor: default; }
+.feiying :is(button, a):focus-visible { outline: 1px solid var(--fy-accent); outline-offset: 4px; }
+
+/* Copy layers: each screen is a full-viewport layer cross-faded by scroll; --offset adds parallax. */
+.feiying__copy { position: absolute; inset: 0; z-index: 5; padding: clamp(9rem, 22vh, 13rem) var(--fy-edge) clamp(3rem, 9vh, 6rem); display: flex; flex-direction: column; pointer-events: none; opacity: 0; transform: translate3d(0, calc(var(--offset, 0) * 1px), 0); }
+.feiying__copy :is(button, a) { pointer-events: auto; }
+.feiying__copy h2 { margin: 0; display: grid; font: 600 clamp(2.6rem, 5.6vw, 6.2rem)/1.14 var(--font-display); letter-spacing: .02em; text-shadow: 0 2px 30px #050a0a99; }
+.feiying__eyebrow { margin: 0 0 1.4rem; color: var(--fy-accent); font: 400 1.05rem/1 var(--font-display); letter-spacing: .14em; }
+.feiying__copy hr { width: 2.4rem; margin: 1.8rem 0; border: 0; border-top: 1px solid var(--fy-muted); }
+.feiying__body { margin: 0; display: grid; gap: .55rem; color: var(--fy-text); font: 300 clamp(.95rem, 1.15vw, 1.15rem)/1.6 var(--font-body); letter-spacing: .14em; }
+.feiying__count { position: absolute; right: var(--fy-edge); bottom: clamp(1.5rem, 5vh, 3rem); color: var(--fy-muted); font: 400 .9rem/1 var(--font-display); letter-spacing: .1em; }
+.feiying__count::first-letter { color: var(--fy-accent); }
+
+.feiying__copy--cover { justify-content: center; align-items: stretch; }
+.feiying__split { display: flex !important; justify-content: space-between; gap: 22vw; font-size: clamp(2.8rem, 6.4vw, 7rem) !important; }
+.feiying__split-meta { display: flex; justify-content: space-between; gap: 22vw; margin: 1.6rem 0 0; color: var(--fy-text); font: 400 1rem/1 var(--font-display); letter-spacing: .3em; }
+.feiying__split-meta span::after { content: ''; display: inline-block; width: 8vw; height: 1px; margin-left: 1rem; vertical-align: middle; background: var(--fy-muted); }
+.feiying__verse { position: absolute; left: var(--fy-edge); bottom: 14vh; margin: 0; font: 400 1.05rem/2.3 var(--font-display); letter-spacing: .32em; }
+.feiying__cue { position: absolute; left: 50%; bottom: 7vh; transform: translateX(-50%); margin: 0; font: 300 .85rem/1 var(--font-body); letter-spacing: .26em; }
+.feiying__cue::after { content: ''; position: absolute; left: 50%; top: 2rem; width: 1px; height: 5vh; background: var(--fy-muted); }
+
+.feiying__copy--left { justify-content: center; max-width: 46rem; }
+.feiying__copy--left-top { max-width: 40rem; }
+.feiying__copy--right, .feiying__copy--right-end { align-items: flex-end; justify-content: center; }
+.feiying__copy--right > *, .feiying__copy--right-end > * { width: min(30rem, 38vw); }
+.feiying__copy--right .feiying__count, .feiying__copy--right-end .feiying__count { width: auto; }
+.feiying__points { list-style: none; margin: 2.2rem 0 0; padding: 0; display: flex; gap: 1.6rem; font: 400 1rem/1 var(--font-display); letter-spacing: .2em; }
+.feiying__points--body li + li::before { content: '|'; color: var(--fy-muted); margin-right: 1.6rem; }
+.feiying__points--stone { display: grid; gap: 1.3rem; }
+.feiying__points--stone li::before { content: ''; display: inline-block; width: .5rem; height: .5rem; margin-right: 1rem; background: var(--fy-accent); transform: rotate(45deg) translateY(-2px); }
+.feiying__note { margin-top: auto; color: var(--fy-muted); font: 300 .75rem/1 var(--font-body); letter-spacing: .12em; }
+.feiying__actions { display: flex; gap: 1.2rem; margin-top: 2.4rem; }
+.feiying__actions > * { color: var(--fy-text); border: 1px solid #efe6d2b3; padding: 1rem 1.6rem; text-decoration: none; font-size: .95rem; letter-spacing: .3em; }
+.feiying__actions > *:hover { border-color: var(--fy-accent); color: var(--fy-accent); }
+.feiying__foot { position: absolute; z-index: 5; left: var(--fy-edge); right: var(--fy-edge); bottom: 1.2rem; display: flex; justify-content: space-between; padding-top: .8rem; border-top: 1px solid #efe6d233; color: var(--fy-muted); font: 300 .7rem/1 var(--font-body); letter-spacing: .14em; opacity: 0; pointer-events: none; }
+
+/* Leader labels follow projected 3D anchors; the dot sits on the anchor, text to the right. */
+.feiying__labels { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.feiying__labelset { position: absolute; inset: 0; opacity: 0; }
+.feiying__label { position: absolute; left: 0; top: 0; display: flex; align-items: center; transition: opacity 200ms; will-change: transform; }
+.feiying__label i { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--fy-text); box-shadow: 0 0 0 4px #efe6d222; flex: none; }
+.feiying__label b { position: relative; margin-left: clamp(5rem, 11vw, 11rem); font: 400 1rem/1 var(--font-display); letter-spacing: .18em; color: var(--fy-text); white-space: nowrap; }
+.feiying__label b::before { content: ''; position: absolute; right: calc(100% + .9rem); top: 50%; width: calc(clamp(5rem, 11vw, 11rem) - 1.2rem); height: 1px; background: #efe6d2b3; }
+.feiying__label--dou b, .feiying__label--gong b, .feiying__label--ang b { font-size: 1.5rem; }
+.feiying__label-short { display: none; }
+
+.feiying__loading, .feiying__error { position: absolute; z-index: 7; left: 50%; bottom: 14vh; transform: translateX(-50%); margin: 0; color: var(--fy-muted); font: 300 .8rem/1.6 var(--font-body); letter-spacing: .14em; text-align: center; }
+.feiying__error button { margin-top: .6rem; background: none; border: 1px solid var(--fy-muted); color: var(--fy-text); padding: .5rem 1.1rem; cursor: pointer; }
+
+/* Free view: copy and parallax layers step back; a small panel offers orbit + explode + cut. */
+.feiying--free .feiying__copy, .feiying--free .feiying__labels, .feiying--free .feiying__pines, .feiying--free .feiying__mist, .feiying--free .feiying__foot { opacity: 0 !important; }
+.feiying--free .feiying-canvas { cursor: grab; }
+.feiying__panel { position: absolute; z-index: 8; left: 50%; bottom: 5vh; transform: translateX(-50%); display: flex; align-items: center; gap: 1.6rem; padding: 1rem 1.6rem; background: #0e1a1ad9; border: 1px solid #efe6d22e; backdrop-filter: blur(8px); font: 300 .8rem/1 var(--font-body); letter-spacing: .1em; color: var(--fy-muted); }
+.feiying__panel label { display: flex; align-items: center; gap: .6rem; color: var(--fy-text); }
+.feiying__panel input { accent-color: var(--fy-accent); width: 8rem; }
+.feiying__panel button { background: none; border: 1px solid var(--fy-accent); color: var(--fy-accent); padding: .55rem 1rem; cursor: pointer; letter-spacing: .14em; }
+
+/* Mobile (tutorial 5.6): model above, copy below, smaller type, gentler parallax. */
+@media (max-width: 760px) {
+  .feiying { height: 760svh; }
+  .feiying__bar { top: 4.9rem; flex-wrap: wrap; row-gap: .4rem; }
+  .feiying__mark { display: none; }
+  .feiying__nav { width: 100%; justify-content: space-between; gap: .2rem; order: 2; }
+  .feiying__nav button { font-size: .72rem; letter-spacing: .04em; }
+  .feiying__nav button span { display: none; }
+  .feiying__free { margin-left: auto; font-size: .72rem; }
+  .feiying__copy, .feiying__copy--cover, .feiying__copy--left, .feiying__copy--right, .feiying__copy--right-end { justify-content: flex-end; align-items: flex-start; padding: 0 1.25rem 4.2rem; background: linear-gradient(0deg, #0e1a1af0 0%, #0e1a1ab3 34%, transparent 58%); }
+  .feiying__copy--right > *, .feiying__copy--right-end > * { width: auto; }
+  .feiying__copy h2 { font-size: clamp(1.9rem, 8.4vw, 2.4rem); }
+  .feiying__split { display: grid !important; gap: 0; font-size: clamp(2rem, 9vw, 2.6rem) !important; }
+  .feiying__split-meta { justify-content: flex-start; gap: 1rem; font-size: .78rem; }
+  .feiying__split-meta span::after { display: none; }
+  .feiying__verse { display: none; }
+  .feiying__cue { bottom: 1.4rem; font-size: .7rem; }
+  .feiying__cue::after { display: none; }
+  .feiying__eyebrow { margin-bottom: .8rem; font-size: .85rem; }
+  .feiying__copy hr { margin: 1rem 0; }
+  .feiying__body { font-size: .9rem; letter-spacing: .06em; }
+  .feiying__points { flex-wrap: wrap; gap: .7rem; margin-top: 1rem; font-size: .8rem; }
+  .feiying__points--body li + li::before { margin-right: .7rem; }
+  .feiying__actions { margin-top: 1.2rem; }
+  .feiying__actions > * { padding: .75rem 1rem; font-size: .8rem; letter-spacing: .14em; }
+  .feiying__count { bottom: 1.4rem; font-size: .75rem; }
+  .feiying__note { margin-top: .8rem; }
+  .feiying__foot { display: none; }
+  .feiying__label-full { display: none; }
+  .feiying__label-short { display: inline; }
+  .feiying__label b { margin-left: 3.2rem; font-size: .75rem; letter-spacing: .08em; }
+  .feiying__label b::before { width: 2.4rem; }
+  .feiying__label--dou b, .feiying__label--gong b, .feiying__label--ang b { font-size: 1rem; }
+  .feiying__mist { transform: translate3d(calc(var(--p) * -4%), 0, 0); }
+  .feiying__panel { width: calc(100% - 2rem); flex-wrap: wrap; justify-content: center; gap: .8rem; }
+  .feiying__panel p { width: 100%; text-align: center; margin: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feiying__sky, .feiying__mist, .feiying__pines, .feiying__copy { transform: none !important; }
+}

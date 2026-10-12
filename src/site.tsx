@@ -6,6 +6,8 @@ import { chapterMediaTime, type StorySection } from './storyTiming';
 import { CityChapter } from './CityChapter';
 import { CITY_SCENES } from './cityScenes';
 import { ExhibitHost, type SceneRegistration } from './ExhibitHost';
+import type { ExhibitAssetKind } from './modelAsset';
+import { FeiyingChapter, type ProgressController } from './feiying/FeiyingChapter';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,30 +15,24 @@ type ExhibitController = { setProgress: (value: number) => void; setExpanded: (v
 type ControllerMap = Map<ExhibitKind, ExhibitController>;
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-export const chapters: { id: ExhibitKind; word: string; title: string; subtitle: string; body: string; note: string; fact: string; photo: string; photoNote: string; parts: string }[] = [
+export const chapters: { id: ExhibitAssetKind; word: string; title: string; subtitle: string; body: string; note: string; fact: string; photo: string; photoNote: string; parts: string }[] = [
   {
     id: 'brush', word: '笔', title: '一支笔，写下江南。', subtitle: '湖笔 · 善琏',
     body: '善琏湖笔以细竹为管，以毫成锋。沿着竹管、捆扎的毫根与一束束笔毫，读出一支笔的力道。',
-    note: '清代吴兴贡笔形制参考 · 笔锋是一整束', fact: '“尖、齐、圆、健”是湖笔品评的四字要诀。',
-    photo: 'media/chapter-brush.jpg', photoNote: '毛笔锋毫的材质参考影像', parts: '竹管 · 毫根 · 一整束笔锋',
+    note: '依实拍照片以 Lux3D 生成 · 竹管与兼毫笔锋', fact: '“尖、齐、圆、健”是湖笔品评的四字要诀。',
+    photo: 'media/chapter-brush.jpg', photoNote: '毛笔锋毫的材质参考影像', parts: '老竹笔杆 · 牛角笔斗 · 兼毫笔锋',
   },
   {
     id: 'silk', word: '丝', title: '丝线交错，织出江南。', subtitle: '双林 · 绫绢',
     body: '这是一架依双林绫绢织造原理设计的水平织机示意。经丝逐根绷紧，梭子送入纬丝，筘把纹理推向织物。',
-    note: '96 根经丝逐根建模 · 织机结构为工艺示意', fact: '送经、开口、投梭、打纬、卷布，织造在反复的秩序里完成。',
-    photo: 'media/chapter-silk.jpg', photoNote: '传统织机的经丝场景参考影像', parts: '机架 · 经轴 · 综筘 · 经丝 · 纬丝',
+    note: '依实拍照片以 Lux3D 生成 · 织机结构为工艺示意', fact: '送经、开口、投梭、打纬、卷布，织造在反复的秩序里完成。',
+    photo: 'media/chapter-silk.jpg', photoNote: '传统织机的经丝场景参考影像', parts: '木机架 · 经轴与经丝 · 梭筘 · 卷布轴上的绫绢',
   },
   {
     id: 'tea', word: '叶', title: '一片叶，留住山水。', subtitle: '茶 · 顾渚',
     body: '当代顾渚紫笋在茶汤中舒展。盏身、托盘、澄黄茶汤与芽叶各成一层，托起这一刻的山水。',
-    note: '唐越窑带托盏形制参考 · 冲泡情境为当代示意', fact: '唐代煎茶与今天的整叶冲泡不同；这里展示的是跨时代的器与茶。',
-    photo: 'media/chapter-tea.jpg', photoNote: '长兴茶园 · 山间茶田', parts: '茶盏 · 茶汤 · 芽叶',
-  },
-  {
-    id: 'tower', word: '塔', title: '一座塔，藏着另一座塔。', subtitle: '飞英塔 · 吴兴',
-    body: '飞英塔的奇妙，在于七层八角砖木外塔包裹着五层石塔。拆开飞檐与斗拱，才能看见塔中塔。',
-    note: '外塔七层 · 内塔五层 · 正面开口为观察剖面', fact: '模型是据可查结构制作的数字示意，并非文物测绘复原。',
-    photo: 'media/chapter-tower.jpg', photoNote: '飞英塔内部 · 石塔与外塔木构', parts: '外塔七层 · 斗拱飞檐 · 内塔五层',
+    note: '依越窑带托盏形制以 Lux3D 生成 · 冲泡情境为当代示意', fact: '唐代煎茶与今天的整叶冲泡不同；这里展示的是跨时代的器与茶。',
+    photo: 'media/chapter-tea.jpg', photoNote: '长兴茶园 · 山间茶田', parts: '青瓷茶盏 · 荷叶盏托 · 茶汤与紫笋芽叶',
   },
 ];
 
@@ -65,7 +61,7 @@ export function Chapter({ data, register, onToggle, expanded }: {
         <p className="chapter__fact">{data.fact}</p>
         <div className="chapter__actions">
           <button type="button" className="text-button" aria-pressed={expanded} onClick={() => onToggle(data.id)}>
-            {expanded ? '合拢展品' : '拆开展品'} <span aria-hidden="true">↗</span>
+            {expanded ? '返回' : '近看展品'} <span aria-hidden="true">↗</span>
           </button>
           <span className="drag-hint">拖动模型可旋转</span>
         </div>
@@ -76,8 +72,8 @@ export function Chapter({ data, register, onToggle, expanded }: {
         <ExhibitHost kind={data.id} label={data.subtitle.split(' · ')[0]} register={register} expanded={expanded} />
         <span className="stage-caption">{data.note}</span>
         {expanded && <>
-          <button type="button" className="stage-close" aria-label={`合拢${data.subtitle.split(' · ')[0]}展品`} onClick={() => onToggle(data.id)}>合拢展品 <span aria-hidden="true">×</span></button>
-          <div className="stage-anatomy"><span>数字工艺剖览</span><h3>{data.subtitle}</h3><p>{data.parts}</p><small>拖动旋转 · 滚轮近看</small></div>
+          <button type="button" className="stage-close" aria-label={`返回，结束近看${data.subtitle.split(' · ')[0]}`} onClick={() => onToggle(data.id)}>返回 <span aria-hidden="true">×</span></button>
+          <div className="stage-anatomy"><span>近看展品</span><h3>{data.subtitle}</h3><p>{data.parts}</p><small>拖动旋转 · 滚轮近看</small></div>
         </>}
       </div>
     </div>
@@ -90,7 +86,7 @@ export function App() {
   const [active, setActive] = useState('opening');
   const [videoStatus, setVideoStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [expanded, setExpanded] = useState<Partial<Record<ExhibitKind, boolean>>>({});
-  const register = useCallback((kind: ExhibitKind, scene: ExhibitScene | null) => {
+  const register = useCallback((kind: ExhibitKind, scene: ExhibitScene | ProgressController | null) => {
     if (scene) controllers.current.set(kind, scene);
     else controllers.current.delete(kind);
   }, []);
@@ -137,7 +133,7 @@ export function App() {
     if (video.readyState >= 2) onReady();
     else if (video.error) onError();
 
-    const ids: StorySection[] = ['opening', 'brush', 'thread-bridge', 'silk', 'tea-bridge', 'tea', 'tower', 'city-gate', 'yishang', 'dongwu', 'longemont', 'nanxun-city', 'ending'];
+    const ids: StorySection[] = ['opening', 'brush', 'thread-bridge', 'silk', 'tea-bridge', 'tea', 'tower', 'city-gate', 'yishang', 'dongwu', 'nanxun-city', 'ending'];
     let positions: { id: StorySection; element: HTMLElement; top: number; travel: number }[] = [];
     const measure = () => {
       positions = ids.map((id) => {
@@ -156,10 +152,10 @@ export function App() {
       setActive((previous) => previous === section.id ? previous : section.id);
       for (const item of positions) {
         if (item.id === 'brush' || item.id === 'silk' || item.id === 'tea' || item.id === 'tower'
-          || item.id === 'yishang' || item.id === 'dongwu' || item.id === 'longemont' || item.id === 'nanxun-city') {
+          || item.id === 'yishang' || item.id === 'dongwu' || item.id === 'nanxun-city') {
           controllers.current.get(item.id)?.setProgress(clamp((y - item.top) / item.travel));
         }
-        if (item.id === 'yishang' || item.id === 'dongwu' || item.id === 'longemont' || item.id === 'nanxun-city') {
+        if (item.id === 'yishang' || item.id === 'dongwu' || item.id === 'nanxun-city') {
           const progress = clamp((y - item.top) / item.travel);
           item.element.style.setProperty('--place-progress', String(progress));
           item.element.style.setProperty('--scene-scale', String(1.04 + progress * 0.08));
@@ -190,6 +186,14 @@ export function App() {
       video.removeEventListener('seeked', seek);
       video.removeEventListener('error', onError);
     };
+  }, []);
+
+  useEffect(() => {
+    const target = window.location.hash.slice(1);
+    if (!target) return;
+    const jump = () => document.getElementById(target)?.scrollIntoView({ block: 'start', behavior: 'auto' });
+    const raf = requestAnimationFrame(() => requestAnimationFrame(jump));
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   return <>
@@ -251,7 +255,8 @@ export function App() {
 
       <Chapter data={chapters[2]} register={register} onToggle={onToggle} expanded={Boolean(expanded.tea)} />
 
-      <Chapter data={chapters[3]} register={register} onToggle={onToggle} expanded={Boolean(expanded.tower)} />
+      {/* 飞英塔 follows the six-screen design boards (production/feiying/design). */}
+      <FeiyingChapter register={register} />
 
       <section id="city-gate" className="city-gate" data-story-section>
         <div className="city-gate__viewport">
@@ -289,6 +294,8 @@ export function App() {
         <a href="https://commons.wikimedia.org/wiki/File:Silk-weaving_loom_(7440319270).jpg" target="_blank" rel="noreferrer">织机照片 · Caitriana Nicholson / CC BY-SA 2.0 ↗</a>
         <a href="https://commons.wikimedia.org/wiki/File:%E5%B8%B8%E8%88%88%E8%8C%B6%E5%9C%92_Changxing_Tea_Plantation_-_panoramio.jpg" target="_blank" rel="noreferrer">长兴茶园照片 · lienyuan lee / CC BY 3.0 ↗</a>
         <a href="https://commons.wikimedia.org/wiki/File:Feiying_Pagoda_2.jpg" target="_blank" rel="noreferrer">飞英塔内部照片 · 钉钉 / CC BY-SA 4.0 ↗</a>
+        <a href="https://commons.wikimedia.org/wiki/File:Pagoda_Feiying.jpeg" target="_blank" rel="noreferrer">飞英塔外观照片（建模参考） · Wikimedia Commons ↗</a>
+        <small>飞英塔章节：设计稿与天空、雾、树影图层由 AI 生图生成；三维部件由 Aholo Lux3D 生成，在 Blender 中组装。</small>
         {CITY_SCENES.flatMap((scene) => [
           <a key={`${scene.id}-one`} href={scene.sourceUrl} target="_blank" rel="noreferrer">{scene.place.split(' · ')[0]} · {scene.imageCaption} / {scene.sourceLabel} ↗</a>,
           <a key={`${scene.id}-two`} href={scene.secondarySourceUrl} target="_blank" rel="noreferrer">{scene.place.split(' · ')[0]} · {scene.secondaryCaption} / {scene.secondarySourceLabel} ↗</a>,

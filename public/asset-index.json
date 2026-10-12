@@ -1,0 +1,523 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-12",
+  "status": "lux3d-standard",
+  "note": "Runtime asset paths verified against src/modelAsset.ts. Static metadata does not certify visual fidelity, factual reconstruction, mobile performance or completed tutorial design gates.",
+  "exhibits": {
+    "tower": {
+      "previous": {
+        "webGlb": "models/tower-hifi.glb",
+        "note": "superseded 2026-10-12 by the tutorial pipeline below; history only",
+        "removed": "2026-10-12: tower.glb, tower-hifi.glb, tower-lux3d.glb and media/models/tower*.webp deleted from public/; Blender sources remain in assets/blender/sources/tower*.blend"
+      },
+      "pipeline": "Feishu tutorial «用 AI 三步创建 3D 视差滚动网站»: six design boards → Lux3D parts + Blender assembly → scroll site",
+      "designBoards": [
+        "production/feiying/design/01-首页.png",
+        "production/feiying/design/02-整体.png",
+        "production/feiying/design/03-结构.png",
+        "production/feiying/design/04-细节.png",
+        "production/feiying/design/05-价值.png",
+        "production/feiying/design/06-收尾.png"
+      ],
+      "designSpec": "production/feiying/design/design-spec.md",
+      "sourceBlend": "production/feiying/models/assembled/feiying.blend",
+      "assemblyScript": "production/feiying/scripts/assemble.py",
+      "webGlb": "models/feiying/feiying.glb",
+      "mobileGlb": "models/feiying/feiying-mobile.glb",
+      "builder": "lux3d+blender",
+      "lux3dParts": {
+        "A_floor": {
+          "role": "standard outer floor, reused for floors 2–6",
+          "mode": "G1"
+        },
+        "B_top": {
+          "role": "floor 7 with pyramidal roof",
+          "mode": "G1"
+        },
+        "C_spire": {
+          "role": "iron finial",
+          "mode": "G1-Turbo",
+          "note": "G1 attempt failed twice (not charged); turbo kept"
+        },
+        "D_base": {
+          "role": "floor 1 with 副阶 gallery and plinth",
+          "mode": "G1"
+        },
+        "E_inner": {
+          "role": "five-storey stone pagoda",
+          "mode": "G1"
+        },
+        "F_dougong": {
+          "role": "bracket-set close-up exhibit (screen 04)",
+          "mode": "G1"
+        }
+      },
+      "quality": {
+        "embeddedTextures": true,
+        "namedNodes": true,
+        "mobileVersion": true,
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 7151896,
+        "mobileBytes": 5400368,
+        "visualReview": "done 2026-10-12: artifacts/qa-feiying (desktop + mobile, six screens)",
+        "browserChecks": "scripts/verify-feiying.mjs — 35/35"
+      },
+      "partTransforms": [
+        {
+          "node": "外塔_01_副阶",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 0,
+          "source": "D_base"
+        },
+        {
+          "node": "外塔_02",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            3.6605,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 3.2,
+          "source": "A_floor"
+        },
+        {
+          "node": "外塔_03",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            8.2416,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 6.4,
+          "source": "A_floor"
+        },
+        {
+          "node": "外塔_04",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            12.5857,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 9.6,
+          "source": "A_floor"
+        },
+        {
+          "node": "外塔_05",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            16.693,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 12.8,
+          "source": "A_floor"
+        },
+        {
+          "node": "外塔_06",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            20.5632,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 16,
+          "source": "A_floor"
+        },
+        {
+          "node": "外塔_07_顶层",
+          "parent": "outer_tower",
+          "position": [
+            0,
+            24.1965,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 19.2,
+          "source": "B_top"
+        },
+        {
+          "node": "塔刹",
+          "parent": "feiying_tower",
+          "position": [
+            0,
+            28.9981,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": [
+            0,
+            1,
+            0
+          ],
+          "explodeDistance": 23.4,
+          "source": "C_spire"
+        },
+        {
+          "node": "内塔_石塔",
+          "parent": "feiying_tower",
+          "position": [
+            0,
+            0.9735,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": null,
+          "explodeDistance": null,
+          "source": "E_inner"
+        },
+        {
+          "node": "细部_斗栱",
+          "parent": null,
+          "position": [
+            22.4,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "explodeDirection": null,
+          "explodeDistance": null,
+          "source": "F_dougong"
+        }
+      ]
+    },
+    "brush": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073284",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/brush.png",
+      "rawModel": "production/items/models/brush_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/brush.glb",
+      "mobileGlb": "models/items/brush-mobile.glb",
+      "posters": [
+        "media/items/brush.webp",
+        "media/items/brush-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 1294720,
+        "mobileBytes": 720320,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/brush.glb",
+        "sourceBlend": "assets/blender/sources/brush.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    },
+    "silk": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073289",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/loom.png",
+      "rawModel": "production/items/models/loom_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/loom.glb",
+      "mobileGlb": "models/items/loom-mobile.glb",
+      "posters": [
+        "media/items/loom.webp",
+        "media/items/loom-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 1398264,
+        "mobileBytes": 763404,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/loom.glb",
+        "sourceBlend": "assets/blender/sources/loom.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    },
+    "tea": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073516",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/tea.png",
+      "rawModel": "production/items/models/tea_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/tea.glb",
+      "mobileGlb": "models/items/tea-mobile.glb",
+      "posters": [
+        "media/items/tea.webp",
+        "media/items/tea-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 1023468,
+        "mobileBytes": 637180,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/tea.glb",
+        "sourceBlend": "assets/blender/sources/tea.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    },
+    "yishang": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073519",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/yishang.png",
+      "rawModel": "production/items/models/yishang_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/yishang.glb",
+      "mobileGlb": "models/items/yishang-mobile.glb",
+      "posters": [
+        "media/items/yishang.webp",
+        "media/items/yishang-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 1278700,
+        "mobileBytes": 720644,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/city-yishang.glb",
+        "sourceBlend": "assets/blender/sources/city-yishang.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    },
+    "dongwu": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073622",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/dongwu.png",
+      "rawModel": "production/items/models/dongwu_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/dongwu.glb",
+      "mobileGlb": "models/items/dongwu-mobile.glb",
+      "posters": [
+        "media/items/dongwu.webp",
+        "media/items/dongwu-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 2920984,
+        "mobileBytes": 1407096,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/city-dongwu.glb",
+        "sourceBlend": "assets/blender/sources/city-dongwu.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    },
+    "nanxun-city": {
+      "builder": "lux3d",
+      "lux3dMode": "G1",
+      "lux3dTaskId": "4073625",
+      "display": "whole model (no part explosion), close-up on expand",
+      "reference": "production/items/refs/nanxun.png",
+      "rawModel": "production/items/models/nanxun_glb.glb",
+      "exportScript": "production/items/scripts/export_item.py",
+      "renderScript": "production/items/scripts/render_item.py",
+      "webGlb": "models/items/nanxun.glb",
+      "mobileGlb": "models/items/nanxun-mobile.glb",
+      "posters": [
+        "media/items/nanxun.webp",
+        "media/items/nanxun-detail.webp"
+      ],
+      "quality": {
+        "compression": [
+          "KHR_draco_mesh_compression",
+          "EXT_texture_webp"
+        ],
+        "bytes": 1346188,
+        "mobileBytes": 749648,
+        "mobileVersion": true
+      },
+      "previous": {
+        "webGlb": "models/city-nanxun.glb",
+        "sourceBlend": "assets/blender/sources/city-nanxun.blend",
+        "archivedTo": "production/archive/previous-exhibits/models/"
+      }
+    }
+  },
+  "verificationDate": "2026-10-11",
+  "removed": {
+    "longemont": {
+      "date": "2026-10-12",
+      "reason": "chapter removed at the user's request",
+      "sourceBlend": "assets/blender/sources/city-longemont.blend",
+      "note": "runtime GLB and photos deleted; restore from git if needed"
+    }
+  }
+}

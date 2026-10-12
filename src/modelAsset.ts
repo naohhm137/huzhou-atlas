@@ -1,20 +1,26 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import type { ExhibitModel, MovablePart } from './models/shared';
 
-export type ExhibitAssetKind = 'brush' | 'silk' | 'tea' | 'tower' | 'yishang' | 'dongwu' | 'longemont' | 'nanxun-city';
+export type ExhibitAssetKind = 'brush' | 'silk' | 'tea' | 'yishang' | 'dongwu' | 'nanxun-city';
+export type AssetIndexPath = string;
+// Each exhibit is one Lux3D standard-tier model, exported by production/items/scripts/export_item.py.
 const fileName: Record<ExhibitAssetKind, string> = {
-  brush: 'brush', silk: 'loom', tea: 'tea', tower: 'tower',
-  yishang: 'city-yishang', dongwu: 'city-dongwu', longemont: 'city-longemont', 'nanxun-city': 'city-nanxun',
+  brush: 'brush', silk: 'loom', tea: 'tea', yishang: 'yishang', dongwu: 'dongwu', 'nanxun-city': 'nanxun',
 };
-const loader = new GLTFLoader();
+const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath(`${import.meta.env.BASE_URL}draco/`));
 
-export function assetPathFor(kind: ExhibitAssetKind): string {
-  return `${import.meta.env.BASE_URL}models/${fileName[kind]}.glb`;
+export function assetPathFor(kind: ExhibitAssetKind, mobile = false): string {
+  return `${import.meta.env.BASE_URL}models/items/${fileName[kind]}${mobile ? '-mobile' : ''}.glb`;
+}
+
+export function assetIndexPath(): AssetIndexPath {
+  return `${import.meta.env.BASE_URL}asset-index.json`;
 }
 
 export function posterPathFor(kind: ExhibitAssetKind, expanded: boolean): string {
-  return `${import.meta.env.BASE_URL}media/models/${fileName[kind]}${expanded ? '-expanded' : ''}.webp`;
+  return `${import.meta.env.BASE_URL}media/items/${fileName[kind]}${expanded ? '-detail' : ''}.webp`;
 }
 
 export function collectMovableParts(root: THREE.Object3D): MovablePart[] {
@@ -43,10 +49,10 @@ export function fitCameraDistance(size: { width: number; height: number; depth: 
 }
 
 export async function loadExhibitAsset(kind: ExhibitAssetKind): Promise<ExhibitModel> {
-  const gltf = await loader.loadAsync(assetPathFor(kind));
+  const mobile = typeof window !== 'undefined' && Math.min(window.innerWidth, window.innerHeight) < 720;
+  const gltf = await loader.loadAsync(assetPathFor(kind, mobile));
   const root = new THREE.Group();
   root.add(gltf.scene);
-  const parts = collectMovableParts(root);
-  if (!parts.length) throw new Error(`No movable Blender parts in ${kind}`);
-  return { root, parts, metadata: {} };
+  // Exhibits are shown whole (no part explosion); a model may still carry explode metadata.
+  return { root, parts: collectMovableParts(root), metadata: {} };
 }

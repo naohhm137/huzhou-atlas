@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { ExhibitScene, type ExhibitKind } from './exhibits';
-import { posterPathFor } from './modelAsset';
+import { posterPathFor, type ExhibitAssetKind } from './modelAsset';
 import { SceneFailure, sceneFailureMessage } from './sceneFailure';
 
 export type SceneRegistration = (kind: ExhibitKind, scene: ExhibitScene | null) => void;
 
-export function ExhibitHost({ kind, label, register, expanded = false }: { kind: ExhibitKind; label: string; register: SceneRegistration; expanded?: boolean }) {
+export function ExhibitHost({ kind, label, register, expanded = false }: { kind: ExhibitAssetKind; label: string; register: SceneRegistration; expanded?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const currentScene = useRef<ExhibitScene | null>(null);
   const expandedRef = useRef(expanded);
@@ -52,7 +52,7 @@ export function ExhibitHost({ kind, label, register, expanded = false }: { kind:
     };
   }, [kind, register, failure, attempt]);
   return <div className={`exhibit-host${failure ? ' is-failed' : ''}`} ref={host} aria-label={`${label} 三维模型`} data-failure={failure?.kind}>
-    <img className="exhibit-poster" src={posterPathFor(kind, expanded)} alt={`${label}模型 · ${expanded ? '拆解' : '合拢'}视图`} loading="lazy" />
+    <img className="exhibit-poster" src={posterPathFor(kind, expanded)} alt={`${label}模型 · ${expanded ? '近看' : '全貌'}视图`} loading="lazy" />
     {!failure && <p className="exhibit-loading" role="status">正在载入可旋转场景…</p>}
     {failure && <div className="exhibit-status" role="status">
       <p>{sceneFailureMessage(failure.kind)}</p>

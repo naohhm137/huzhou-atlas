@@ -3,11 +3,10 @@ import * as THREE from 'three';
 import { assetPathFor, collectMovableParts, fitCameraDistance } from '../modelAsset';
 
 describe('GLB part contract', () => {
-  it('routes each city chapter to the corresponding Blender city asset', () => {
-    expect(assetPathFor('yishang')).toMatch(/models\/city-yishang\.glb$/);
-    expect(assetPathFor('dongwu')).toMatch(/models\/city-dongwu\.glb$/);
-    expect(assetPathFor('longemont')).toMatch(/models\/city-longemont\.glb$/);
-    expect(assetPathFor('nanxun-city')).toMatch(/models\/city-nanxun\.glb$/);
+  it('routes each city chapter to its Lux3D model', () => {
+    expect(assetPathFor('yishang')).toMatch(/models\/items\/yishang\.glb$/);
+    expect(assetPathFor('dongwu')).toMatch(/models\/items\/dongwu\.glb$/);
+    expect(assetPathFor('nanxun-city')).toMatch(/models\/items\/nanxun\.glb$/);
   });
   it('records a node origin and normalizes its explosion direction', () => {
     const root = new THREE.Group();

@@ -3,9 +3,7 @@ import { chapterMediaTime, MEDIA_RANGES } from '../storyTiming';
 import { makeBrush } from '../models/brush';
 import { makeLoom } from '../models/loom';
 import { makeTea } from '../models/tea';
-import { makeTower } from '../models/tower';
 import { displacedPosition } from '../models/shared';
-import * as THREE from 'three';
 
 describe('story exposure and reversibility', () => {
   it('holds the Nanxun photograph through the opening', () => {
@@ -39,28 +37,6 @@ describe('museum-inspired structures', () => {
     expect(model.metadata.saucerDiameter / model.metadata.bowlDiameter).toBeGreaterThan(1.3);
     expect(model.parts.some(part => part.group.name.includes('茶汤'))).toBe(true);
     expect(model.parts.filter(part => part.group.name.includes('芽叶')).length).toBeGreaterThanOrEqual(5);
-  });
-  it('reveals the five-level inner stone pagoda beneath seven distinct outer timber levels', () => {
-    const model = makeTower();
-    expect(model.parts.filter(part => part.group.name.startsWith('外塔楼层')).length).toBe(7);
-    expect(model.parts.filter(part => part.group.name.startsWith('内塔石层')).length).toBe(5);
-    expect(model.parts.filter(part => part.group.name.startsWith('外塔飞檐')).length).toBe(7);
-    expect(model.parts.length).toBeGreaterThanOrEqual(23);
-    expect(model.parts.some(part => part.group.name.includes('斗拱'))).toBe(true);
-    expect(model.parts.some(part => part.group.name.includes('须弥座'))).toBe(true);
-  });
-  it('leaves a sightline through the outer tower into the inner stone tower', () => {
-    const model = makeTower();
-    model.root.updateMatrixWorld(true);
-    const ray = new THREE.Raycaster(new THREE.Vector3(0, -1.9, 8), new THREE.Vector3(0, 0, -1));
-    const first = ray.intersectObject(model.root, true)[0]?.object;
-    let cursor: THREE.Object3D | null = first ?? null;
-    let inInnerTower = false;
-    while (cursor) {
-      if (cursor.name.startsWith('内塔')) inInnerTower = true;
-      cursor = cursor.parent;
-    }
-    expect(inInnerTower).toBe(true);
   });
 });
 

@@ -37,7 +37,6 @@ export function CityChapter({ scene, register, expanded, onToggle }: {
         <img className={`city__image city__image--secondary${second || comparing ? ' is-current' : ''}`} src={scene.secondaryImage} alt={scene.secondaryAlt} loading="lazy" aria-hidden={!comparing && !second} />
         <div className="city__image-wash" aria-hidden="true" />
         {scene.motion === 'towers' && <div className="city__tower-lines" aria-hidden="true"><span /><span /><span /></div>}
-        {scene.motion === 'theatre' && <div className="city__theatre-ring" aria-hidden="true" />}
         {scene.motion === 'street' && <div className="city__street-lines" aria-hidden="true"><span /><span /></div>}
         {comparing && <div className="city__compare" aria-label="南浔两处河巷的照片对照">
           <div className="city__compare-line" aria-hidden="true"><span>↔</span></div>
@@ -52,10 +51,10 @@ export function CityChapter({ scene, register, expanded, onToggle }: {
       </div>
       <div className="city__model-stage">
         <ExhibitHost kind={scene.id} label={scene.place.split(' · ')[0]} register={register} expanded={expanded} />
-        <span className="city__model-label">Blender 实景参照模型 · 非测绘复原 · 拖动旋转</span>
+        <span className="city__model-label">Lux3D 实景微缩模型 · 非测绘复原 · 拖动旋转</span>
         {expanded && <>
-          <button type="button" className="stage-close" onClick={() => onToggle(scene.id)} aria-label={`合拢${scene.place.split(' · ')[0]}场景`}>合拢场景 <span aria-hidden="true">×</span></button>
-          <div className="stage-anatomy"><span>城市结构剖览</span><h3>{scene.place.split(' · ')[0]}</h3><p>{scene.modelParts}</p><small>拖动旋转 · 滚轮近看 · Esc 合拢</small></div>
+          <button type="button" className="stage-close" onClick={() => onToggle(scene.id)} aria-label={`返回，结束近看${scene.place.split(' · ')[0]}`}>返回 <span aria-hidden="true">×</span></button>
+          <div className="stage-anatomy"><span>近看街区</span><h3>{scene.place.split(' · ')[0]}</h3><p>{scene.modelParts}</p><small>拖动旋转 · 滚轮缩放 · Esc 返回</small></div>
         </>}
       </div>
       <div className="city__copy">
@@ -63,7 +62,7 @@ export function CityChapter({ scene, register, expanded, onToggle }: {
         <h2>{scene.title.split('\n').map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h2>
         <p className="city__body">{scene.body}</p>
         <div className="city__model-actions">
-          <button type="button" className="text-button" aria-pressed={expanded} onClick={() => onToggle(scene.id)}>{expanded ? '合拢场景' : '拆开场景'} <span aria-hidden="true">↗</span></button>
+          <button type="button" className="text-button" aria-pressed={expanded} onClick={() => onToggle(scene.id)}>{expanded ? '返回' : '近看场景'} <span aria-hidden="true">↗</span></button>
           <span className="drag-hint">拖动模型可旋转</span>
         </div>
         {scene.motion !== 'water' && <div className="city__views" role="group" aria-label={`${scene.place}实景视角`}>

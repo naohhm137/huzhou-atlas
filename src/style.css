@@ -59,12 +59,10 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .chapter { position: relative; height: 185svh; background: var(--color-ink); }
 .chapter--silk { background: var(--color-slate); }
 .chapter--tea { background: var(--color-tea); }
-.chapter--tower { background: #24231f; }
 .chapter__viewport { position: sticky; top: 0; min-height: 100svh; height: 100dvh; overflow: hidden; display: grid; grid-template-columns: 43% 57%; }
 .chapter__texture { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 73% 48%, var(--color-forest), transparent 52%); opacity: 0.42; }
 .chapter--silk .chapter__texture { background: radial-gradient(ellipse at 72% 51%, var(--color-slate), transparent 58%); opacity: 1; }
 .chapter--tea .chapter__texture { background: radial-gradient(ellipse at 75% 52%, var(--color-forest), transparent 53%); opacity: 0.7; }
-.chapter--tower .chapter__texture { background: radial-gradient(ellipse at 71% 55%, #775b43, transparent 62%); opacity: 0.3; }
 .chapter__copy { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 7rem 2rem 4.5rem clamp(1.25rem, 5vw, 5.5rem); max-width: 47rem; }
 .chapter__small { margin: 0 0 2rem; color: var(--color-accent); font-size: 0.74rem; letter-spacing: 0.24em; }
 .chapter__word { font-family: var(--font-display); font-size: clamp(7rem, 19vw, 20rem); line-height: 0.9; font-weight: 500; color: var(--color-paper); opacity: 0.08; position: absolute; left: clamp(1rem, 4vw, 4.5rem); top: 16%; pointer-events: none; }
@@ -83,10 +81,8 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .chapter--brush .chapter__photo img { object-position: 60% 50%; }
 .chapter--silk .chapter__photo img { object-position: 46% 54%; opacity: 0.30; }
 .chapter--tea .chapter__photo img { object-position: 42% 69%; opacity: 0.33; }
-.chapter--tower .chapter__photo img { object-position: 50% 34%; opacity: 0.31; }
 .chapter--silk .chapter__photo::after { background: linear-gradient(90deg, var(--color-slate), transparent 35%, transparent 78%, var(--color-slate)), linear-gradient(0deg, var(--color-slate), transparent 34%, transparent 73%, var(--color-slate)); }
 .chapter--tea .chapter__photo::after { background: linear-gradient(90deg, var(--color-tea), transparent 35%, transparent 78%, var(--color-tea)), linear-gradient(0deg, var(--color-tea), transparent 34%, transparent 73%, var(--color-tea)); }
-.chapter--tower .chapter__photo::after { background: linear-gradient(90deg, #24231f, transparent 35%, transparent 78%, #24231f), linear-gradient(0deg, #24231f, transparent 34%, transparent 73%, #24231f); }
 .chapter__photo figcaption { position: absolute; z-index: 1; left: 7%; bottom: 5%; color: var(--color-paper-muted); font-size: 0.68rem; letter-spacing: 0.08em; text-shadow: 0 2px 12px #0c1715; }
 .stage-orbit { position: absolute; border: 1px solid var(--color-line); width: min(57vw, 56rem); height: min(57vw, 56rem); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0.48; pointer-events: none; }
 .stage-orbit--two { width: min(42vw, 40rem); height: min(42vw, 40rem); opacity: 0.22; }
@@ -109,7 +105,6 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .chapter--expanded .chapter__viewport { position: fixed; inset: 0; width: 100%; height: 100dvh; min-height: 0; z-index: 100; background: var(--color-ink); }
 .chapter--expanded.chapter--silk .chapter__viewport { background: var(--color-slate); }
 .chapter--expanded.chapter--tea .chapter__viewport { background: var(--color-tea); }
-.chapter--expanded.chapter--tower .chapter__viewport { background: #24231f; }
 .chapter--expanded .chapter__copy { visibility: hidden; pointer-events: none; }
 .chapter--expanded .chapter__stage { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
 .chapter--expanded .chapter__photo { inset: 0; }
@@ -144,7 +139,6 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .city { position: relative; height: 185svh; background: var(--color-ink); --scene-scale: 1.06; --scene-shift: 0px; --tower-reveal: 0%; --iris: 140%; }
 .city--street { background: #172019; }
 .city--towers { background: #17262a; }
-.city--theatre { background: #29211e; }
 .city--water { background: #1a2725; }
 .city__viewport { position: sticky; top: 0; width: 100%; height: 100dvh; min-height: 100svh; display: grid; grid-template-columns: 41% 59%; overflow: hidden; isolation: isolate; }
 .city__media { position: absolute; z-index: 0; inset: 0 0 0 41%; overflow: hidden; background: #13201d; }
@@ -153,17 +147,14 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .city__image.is-current { opacity: 1; }
 .city--street .city__image { object-position: 50% 58%; }
 .city--towers .city__image { object-position: 50% 24%; }
-.city--theatre .city__image { object-position: 50% 50%; }
 .city--water .city__image { object-position: 50% 50%; }
 .city--photo-compare .city__image { opacity: 0.82; }
 .city--photo-compare .city__image--secondary { clip-path: inset(0 0 0 var(--compare)); }
 .city__image.is-current { opacity: 0.43; }
-.city--theatre .city__image.is-current { opacity: 0.47; }
 .city--photo-compare .city__image.is-current { opacity: 0.82; }
 .city__image-wash { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, #091613bd, transparent 34%, #07121018 78%, #0712102c); }
 .city--street .city__image-wash { background: linear-gradient(90deg, #07120fdf 0%, #07120f9c 34%, transparent 72%), linear-gradient(0deg, #07120fd6 0%, transparent 50%); }
 .city--water .city__image-wash { background: linear-gradient(90deg, #07120fdc 0%, #07120f92 32%, transparent 68%), linear-gradient(0deg, #07120fba 0%, transparent 42%); }
-.city--theatre .city__image-wash { background: linear-gradient(0deg, #211919a6 0%, transparent 39%); }
 .city__model-stage { position: absolute; z-index: 2; inset: 0 0 0 41%; }
 .city__model-stage::before { content: ''; position: absolute; inset: 9% 10%; border: 1px solid #c4aa732b; border-radius: 50%; aspect-ratio: 1; max-height: 80%; margin: auto; pointer-events: none; }
 .city__model-label { position: absolute; left: clamp(1.25rem, 3vw, 3.5rem); bottom: 5%; color: var(--color-paper-muted); font-size: 0.69rem; letter-spacing: 0.1em; pointer-events: none; text-shadow: 0 2px 12px #07120f; }
@@ -200,7 +191,6 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
 .city__tower-lines { position: absolute; inset: 13% 9% 9%; pointer-events: none; display: flex; justify-content: space-between; opacity: 0.45; }
 .city__tower-lines span { width: 1px; background: linear-gradient(transparent, var(--color-accent), transparent); transform-origin: bottom; transform: scaleY(var(--place-progress, 1)); }
 .city__tower-lines span:nth-child(2) { margin-top: 12%; }
-.city__theatre-ring { position: absolute; left: 7%; right: 7%; top: 5%; height: 90%; border: 1px solid #f0d79a89; border-bottom: 0; border-radius: 50% 50% 0 0; pointer-events: none; opacity: 0.7; transform: translateY(calc(var(--scene-shift) * -0.5)); }
 .city__compare { position: absolute; z-index: 2; inset: 0; }
 .city__compare-line { position: absolute; z-index: 1; left: var(--compare); top: 0; bottom: 0; width: 1px; background: #f5ead5c2; box-shadow: 0 0 12px #091613; pointer-events: none; }
 .city__compare-line span { position: absolute; top: 50%; left: 50%; width: 3rem; height: 3rem; display: grid; place-items: center; transform: translate(-50%, -50%); border: 1px solid var(--color-paper); border-radius: 50%; background: #0a1b19b8; color: var(--color-paper); font-size: 1.1rem; }
@@ -239,7 +229,6 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
   .chapter__copy { position: absolute; z-index: 4; top: 53%; left: 0; width: 100%; height: 47%; justify-content: flex-start; padding: 0.6rem 1.5rem 1.5rem; background: linear-gradient(0deg, var(--color-ink) 69%, transparent); }
   .chapter--silk .chapter__copy { background: linear-gradient(0deg, var(--color-slate) 69%, transparent); }
   .chapter--tea .chapter__copy { background: linear-gradient(0deg, var(--color-tea) 69%, transparent); }
-  .chapter--tower .chapter__copy { background: linear-gradient(0deg, #24231f 69%, transparent); }
   .chapter__word { display: none; }
   .chapter__small { margin-bottom: 0.7rem; }
   .chapter h2 { font-size: clamp(2.3rem, 6vw, 3.6rem); margin-bottom: 0.6rem; max-width: 100%; }
@@ -266,7 +255,6 @@ main:has(.chapter--expanded), main:has(.city--expanded) { z-index: 50; }
   .city--expanded .stage-anatomy { width: min(24rem, 56vw); }
   .city__copy, .city--street .city__copy, .city--water .city__copy { position: absolute; left: 0; right: 0; bottom: 0; height: 47%; padding: 1.15rem 1.7rem 2rem; background: linear-gradient(0deg, var(--color-ink) 75%, #0a1b19ed 90%, transparent); text-shadow: none; }
   .city--towers .city__copy { background: linear-gradient(0deg, #17262a 75%, #17262aeb 90%, transparent); }
-  .city--theatre .city__copy { background: linear-gradient(0deg, #29211e 75%, #29211ee8 90%, transparent); }
   .city--water .city__copy { background: linear-gradient(0deg, #1a2725 75%, #1a2725eb 90%, transparent); }
   .city__place { margin-bottom: 0.7rem; }
   .city h2 { font-size: clamp(2.3rem, 5.5vw, 3.8rem); margin-bottom: 0.7rem; line-height: 1.28; }

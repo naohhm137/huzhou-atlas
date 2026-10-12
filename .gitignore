@@ -8,3 +8,18 @@ __pycache__/
 *.log
 *.env
 .env.*
+
+# Production working files: keep scripts, design boards and notes in git; skip bulky,
+# regenerable or third-party data (Lux3D raw downloads, the Feishu tutorial export, logs).
+/production/**/models/
+/production/**/logs/
+/production/**/tutorial/
+/production/**/refs/
+/production/**/renders/
+/production/**/layers/
+/production/**/inspect/
+/production/**/review/
+/production/archive/
+/production/*.jpg
+/.claude/
+/assets/blender/sources/tower-hifi.blend

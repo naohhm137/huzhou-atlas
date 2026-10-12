@@ -9,7 +9,6 @@ export const MEDIA_RANGES = {
   'city-gate': [7.75, 7.75],
   yishang: [7.75, 7.75],
   dongwu: [7.75, 7.75],
-  longemont: [7.75, 7.75],
   'nanxun-city': [7.75, 7.75],
   ending: [7.75, 9.9],
 } as const satisfies Record<string, readonly [number, number]>;
